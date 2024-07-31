@@ -55,6 +55,7 @@ class GoogleDriveReader(BasePydanticReader):
             file to text. See `SimpleDirectoryReader` for more details.
     """
 
+    google_api_access_token: Optional[str] = None
     drive_id: Optional[str] = None
     folder_id: Optional[str] = None
     file_ids: Optional[List[str]] = None
@@ -73,6 +74,7 @@ class GoogleDriveReader(BasePydanticReader):
 
     def __init__(
         self,
+        google_api_access_token: Optional[str] = None,
         drive_id: Optional[str] = None,
         folder_id: Optional[str] = None,
         file_ids: Optional[List[str]] = None,
@@ -123,6 +125,7 @@ class GoogleDriveReader(BasePydanticReader):
             **kwargs,
         )
 
+        self.google_api_access_token = google_api_access_token
         self._creds = None
         self._is_cloud = is_cloud
         # Download Google Docs/Slides/Sheets as actual files
@@ -159,6 +162,9 @@ class GoogleDriveReader(BasePydanticReader):
         """
         # First, we need the Google API credentials for the app
         creds = None
+
+        if self.google_api_access_token is not None:
+            return Credentials(token=access_token)
 
         if self.authorized_user_info is not None:
             creds = Credentials.from_authorized_user_info(
